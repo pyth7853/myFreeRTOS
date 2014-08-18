@@ -68,21 +68,21 @@ prvInit()
 static void GameEventTask1( void *pvParameters )
 {
 	while( 1 ){
-		GAME_EventHandler1();
+		GAME_EventHandler1();   // implement in game.c 
 	}
 }
 
 static void GameEventTask2( void *pvParameters )
 {
 	while( 1 ){
-		GAME_EventHandler2();
+		GAME_EventHandler2();    // implement in game.c 
 	}
 }
 
 static void GameEventTask3( void *pvParameters )
 {
 	while( 1 ){
-		GAME_EventHandler3();
+		GAME_EventHandler3();    // implement in game.c 
 	}
 }
 
@@ -100,7 +100,7 @@ int main(void)
 {
 	prvInit();
 
-	if( STM_EVAL_PBGetState( BUTTON_USER ) )
+	if( STM_EVAL_PBGetState( BUTTON_USER ) )   //two players will auto play ball    (after press 'reset' btn ,then press 'user' btn quickly can enter demoMode = 1 !!)
 		demoMode = 1;
 
 	xTaskCreate( GameTask, (signed char*) "GameTask", 128, NULL, tskIDLE_PRIORITY + 1, NULL );

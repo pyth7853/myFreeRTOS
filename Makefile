@@ -8,7 +8,7 @@ HEX_IMAGE = $(PROJECT).hex
 STDP ?= ../STM32F429I-Discovery_FW_V1.0.1
 
 # Toolchain configurations
-CROSS_COMPILE ?= arm-none-eabi-
+CROSS_COMPILE ?= /home/STM32/toolchain/gcc-arm-none-eabi-4_8-2014q2/bin/arm-none-eabi-
 CC = $(CROSS_COMPILE)gcc
 LD = $(CROSS_COMPILE)ld
 OBJCOPY = $(CROSS_COMPILE)objcopy
