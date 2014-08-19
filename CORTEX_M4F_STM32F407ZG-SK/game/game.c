@@ -112,22 +112,27 @@ BallReset()
 void
 GAME_EventHandler1()
 {
-        char t;
-        if ((t == '\r')) {
-            while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-            USART_SendData(USART1, t);
-            t = '\n';
-        }
+    	RCC_Configuration();
+    	GPIO_Configuration();
+    	USART1_Configuration();
+
+        while(USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);
+        char t = USART_ReceiveData(USART1);
 
 
-	if( STM_EVAL_PBGetState( BUTTON_USER ) ){    // if press user btn player1 run to another way
-
+	if ( t=='l' ){
 		player1IsReversed = 0;
-
-		while( STM_EVAL_PBGetState( BUTTON_USER ) );   // if still press user btn then stop here 
-
-		player1IsReversed = 1;   // when release user btn then player1 go back origin direction
+	}else if ( t=='r' ){
+		player1IsReversed = 1;
 	}
+//	if( STM_EVAL_PBGetState( BUTTON_USER ) ){    // if press user btn player1 run to another way
+
+//		player1IsReversed = 0;
+
+//		while( STM_EVAL_PBGetState( BUTTON_USER ) );   // if still press user btn then stop here 
+
+//		player1IsReversed = 1;   // when release user btn then player1 go back origin direction
+//	}
 }
 
 void

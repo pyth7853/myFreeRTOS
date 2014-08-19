@@ -103,6 +103,9 @@ int main(void)
 	if( STM_EVAL_PBGetState( BUTTON_USER ) )   //two players will auto play ball    (after press 'reset' btn ,then press 'user' btn quickly can enter demoMode = 1 !!)
 		demoMode = 1;
 
+
+
+
 	xTaskCreate( GameTask, (signed char*) "GameTask", 128, NULL, tskIDLE_PRIORITY + 1, NULL );
 	xTaskCreate( GameEventTask1, (signed char*) "GameEventTask1", 128, NULL, tskIDLE_PRIORITY + 1, NULL );
 	xTaskCreate( GameEventTask2, (signed char*) "GameEventTask2", 128, NULL, tskIDLE_PRIORITY + 1, NULL );

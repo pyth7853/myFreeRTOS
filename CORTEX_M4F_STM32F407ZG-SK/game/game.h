@@ -16,4 +16,13 @@ GAME_Update();
 void
 GAME_Render();
 
+// for usart communcation
+void 
+RCC_Configuration();
+
+void 
+GPIO_Configuration();
+
+void 
+USART1_Configuration();
 #endif
