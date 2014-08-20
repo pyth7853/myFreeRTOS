@@ -23,7 +23,7 @@ uint16_t player2H = 10;
 uint8_t player2IsReversed = 0;
 
 //Ball
-uint16_t ballSize = 15;
+uint16_t ballSize = 8;
 int16_t ballX = ( LCD_PIXEL_WIDTH - 5 ) / 2;  //  curr ball X
 int16_t ballY = ( LCD_PIXEL_HEIGHT - 5 ) / 2;  //  curr ball Y
 int16_t ballVX = 5;  //   控制X軸正反方向
@@ -32,69 +32,6 @@ uint8_t ballIsRun = 0;
 
 //Mode
 uint8_t demoMode = 0;
-
-//USART communcation
-void RCC_Configuration(void)
-{
-      /* --------------------------- System Clocks Configuration -----------------*/
-      /* USART1 clock enable */
-      RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-      /* GPIOA clock enable */
-      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-}
- 
-/**************************************************************************************/
- 
-void GPIO_Configuration(void)
-{
-    GPIO_InitTypeDef GPIO_InitStructure;
-
-    /*-------------------------- GPIO Configuration ----------------------------*/
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-    /* Connect USART pins to AF */
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART1);   // USART1_TX
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART1);  // USART1_RX
-}
- 
-/**************************************************************************************/
- 
-void USART1_Configuration(void)
-{
-    USART_InitTypeDef USART_InitStructure;
-
-    /* USARTx configuration ------------------------------------------------------*/
-    /* USARTx configured as follow:
-     *  - BaudRate = 9600 baud
-     *  - Word Length = 8 Bits
-     *  - One Stop Bit
-     *  - No parity
-     *  - Hardware flow control disabled (RTS and CTS signals)
-     *  - Receive and transmit enabled
-     */
-    USART_InitStructure.USART_BaudRate = 115200;
-    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-    USART_InitStructure.USART_StopBits = USART_StopBits_1;
-    USART_InitStructure.USART_Parity = USART_Parity_No;
-    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-    USART_Init(USART1, &USART_InitStructure);
-    USART_Cmd(USART1, ENABLE);
-}
-
-void USART1_puts(char* s)
-{
-    while(*s) {
-        while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-        USART_SendData(USART1, *s);
-        s++;
-    }
-}
 
 
 void
@@ -112,27 +49,15 @@ BallReset()
 void
 GAME_EventHandler1()
 {
-    	RCC_Configuration();
-    	GPIO_Configuration();
-    	USART1_Configuration();
 
-        while(USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);
-        char t = USART_ReceiveData(USART1);
+	if( STM_EVAL_PBGetState( BUTTON_USER ) ){    // if press user btn player1 run to another way
 
-
-	if ( t=='l' ){
 		player1IsReversed = 0;
-	}else if ( t=='r' ){
-		player1IsReversed = 1;
+
+		while( STM_EVAL_PBGetState( BUTTON_USER ) );   // if still press user btn then stop here 
+
+		player1IsReversed = 1;   // when release user btn then player1 go back origin direction
 	}
-//	if( STM_EVAL_PBGetState( BUTTON_USER ) ){    // if press user btn player1 run to another way
-
-//		player1IsReversed = 0;
-
-//		while( STM_EVAL_PBGetState( BUTTON_USER ) );   // if still press user btn then stop here 
-
-//		player1IsReversed = 1;   // when release user btn then player1 go back origin direction
-//	}
 }
 
 void
@@ -160,7 +85,7 @@ void
 GAME_Update()
 {
 	//Player1
-	LCD_SetTextColor( LCD_COLOR_BLACK );
+	LCD_SetTextColor( LCD_COLOR_BLACK );           //first clean the screen 
 	LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
 	LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
 
@@ -191,7 +116,8 @@ GAME_Update()
 		if( ballIsRun == 1 ){
 
 			LCD_SetTextColor( LCD_COLOR_BLACK );
-			LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+//			LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+			LCD_DrawCircle( ballX, ballY, ballSize ); 
 
 			//Touch wall
 			ballX += ballVX;
@@ -376,11 +302,17 @@ GAME_Update()
 }
 
 	void
-GAME_Render()
+GAME_Render()     //display on screen
 {
-	LCD_SetTextColor( LCD_COLOR_WHITE );
+	LCD_SetTextColor( 0xFBE0 );                 // LCD_SetTextColor(uint16_t Color)     ex: LCD_SetTextColor(0xFBE0)
 	LCD_DrawFullRect( player1X, player1Y, player1W, player1H );
-	LCD_DrawFullRect( player2X, player2Y, player2W, player2H );
-	LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+
+	LCD_SetTextColor( 0x1F );
+	LCD_DrawFullRect( player2X, player2Y, player2W, player2H );	
+
+	LCD_SetTextColor( 0xFFE0 );
+//	LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+	LCD_DrawCircle( ballX, ballY, ballSize );   //LCD_DrawCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius)
+
 	LCD_DrawLine( 10, LCD_PIXEL_HEIGHT / 2, LCD_PIXEL_WIDTH - 20, LCD_DIR_HORIZONTAL );
 }
