@@ -11,24 +11,25 @@
 //Player1
 int16_t player1X = 10;
 int16_t player1Y = 10;
-uint16_t player1W = 20;
+uint16_t player1W = 60;
 uint16_t player1H = 10;
 uint8_t player1IsReversed = 1;
 
 //Player2
 int16_t player2X = LCD_PIXEL_WIDTH - 20;
 int16_t player2Y = LCD_PIXEL_HEIGHT - 20;
-uint16_t player2W = 20;  
+uint16_t player2W = 60;  
 uint16_t player2H = 10;
 uint8_t player2IsReversed = 0;
 
 //Ball
-uint16_t ballSize = 8;
+uint16_t ballSize = 5;
 int16_t ballX = ( LCD_PIXEL_WIDTH - 5 ) / 2;  //  curr ball X
 int16_t ballY = ( LCD_PIXEL_HEIGHT - 5 ) / 2;  //  curr ball Y
-int16_t ballVX = 5;  //   控制X軸正反方向
-int16_t ballVY = 5;  //   控制Y軸正反方向
+int16_t ballVX = 5;  //   vector X : Control X dir
+int16_t ballVY = 5;  //    vector Y : Control Y dir
 uint8_t ballIsRun = 0;
+uint16_t ballSpeed = 1;   // record curr ball move speed;      max speed = 4
 
 //Mode
 uint8_t demoMode = 0;
@@ -42,6 +43,8 @@ BallReset()
 
 	ballVX = 5;
 	ballVY = 5;
+
+	ballSpeed = 1
 
 	ballIsRun = 1;
 }
@@ -133,29 +136,29 @@ GAME_Update()
 			//PONG!
 			ballY += ballVY;
 			if( ballY + ballSize >= player2Y ){
-				if( ballX + ballSize >= player2X && ballX <= player2X + player2W ){
+				if( ballX + ballSize >= player2X && ballX <= player2X + player2W ){     // player2 catch the ball
 					if( ballX - ballSize <= player2Y + player2W/4 ){
 						ballVY =-3;
-						ballVX =-7;
+						ballVX =-7*ballSpeed;
 					}
 					else if( ballX >= player2Y + player2W - player2W/4 ){
 						ballVY =-3;
-						ballVX = 7;
+						ballVX = 7*ballSpeed;
 					}
 					else if( ballX + ballSize < player2Y + player2W/2 ){
-						ballVY =-7;
+						ballVY =-7*ballSpeed;
 						ballVX =-3;
 					}
 					else if( ballX > player2Y + player2W/2 ){
-						ballVY =-7;
+						ballVY =-7*ballSpeed;
 						ballVX = 3;
 					}
-					else{
-						ballVY =-9;
+					else{          
+						ballVY =-9; 
 						ballVX = 0;
 					}
 				}
-				else
+				else  // player2 miss the ball
 					BallReset();
 			}
 
@@ -163,23 +166,27 @@ GAME_Update()
 					if( ballX + ballSize >= player1X && ballX <= player1X + player1W ){
 						if( ballX - ballSize <= player1Y + player1W/4 ){
 							ballVY = 3;
-							ballVX =-7;
+							ballVX =-7*ballSpeed;
 						}
 						else if( ballX >= player1Y + player1W - player1W/4 ){
 							ballVY = 3;
-							ballVX = 7;
+							ballVX = 7*ballSpeed;
 						}
 						else if( ballX + ballSize < player1Y + player1W/2 ){
-							ballVY = 7;
+							ballVY = 7*ballSpeed;
 							ballVX =-3;
 						}
 						else if( ballX > player1Y + player1W/2 ){
-							ballVY = 7;
+							ballVY = 7*ballSpeed;
 							ballVX = 3;
 						}
 						else{
-							ballVY = 9;
+							ballVY = 9*ballSpeed;
 							ballVX = 0;
+						}
+
+						if(ballSpeed<5){
+							ballSpeed = ballSpeed + 1;
 						}
 					}
 					else
@@ -229,7 +236,8 @@ GAME_Update()
 			if( ballIsRun == 1 ){
 
 				LCD_SetTextColor( LCD_COLOR_BLACK );
-				LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+//				LCD_DrawFullRect( ballX, ballY, ballSize, ballSize );
+				LCD_DrawCircle( ballX, ballY, ballSize ); 
 
 				//Touch wall
 				ballX += ballVX;
@@ -247,24 +255,28 @@ GAME_Update()
 				if( ballY + ballSize >= player2Y ){
 					if( ballX + ballSize >= player2X && ballX <= player2X + player2W ){
 					if( ballX - ballSize <= player2Y + player2W/4 ){
-						ballVY =-3;
+						ballVY =-3*ballSpeed;
 						ballVX =-7;
 					}
 					else if( ballX >= player2Y + player2W - player2W/4 ){
-						ballVY =-3;
+						ballVY =-3*ballSpeed;
 						ballVX = 7;
 					}
 					else if( ballX + ballSize < player2Y + player2W/2 ){
-						ballVY =-7;
+						ballVY =-7*ballSpeed;
 						ballVX =-3;
 					}
 					else if( ballX > player2Y + player2W/2 ){
-						ballVY =-7;
+						ballVY =-7*ballSpeed;
 						ballVX = 3;
 					}
 					else{
 						ballVY =-9;
 						ballVX = 0;
+					}
+
+					if(ballSpeed<5){
+						ballSpeed = ballSpeed + 1;
 					}
 				}
 				else
@@ -275,18 +287,18 @@ GAME_Update()
 				if( ballX + ballSize >= player1X && ballX <= player1X + player1W ){
 					if( ballX - ballSize <= player1Y + player1W/4 ){
 						ballVY = 3;
-						ballVX =-7;
+						ballVX =-7*ballSpeed;
 					}
 					else if( ballX >= player1Y + player1W - player1W/4 ){
 						ballVY = 3;
-						ballVX = 7;
+						ballVX = 7*ballSpeed;
 					}
 					else if( ballX + ballSize < player1Y + player1W/2 ){
-						ballVY = 7;
+						ballVY = 7*ballSpeed;
 						ballVX =-3;
 					}
 					else if( ballX > player1Y + player1W/2 ){
-						ballVY = 7;
+						ballVY = 7*ballSpeed;
 						ballVX = 3;
 					}
 					else{
